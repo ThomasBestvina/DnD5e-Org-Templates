@@ -1,0 +1,429 @@
+# -*- eval: (visual-line-mode -1); eval: (when (bound-and-true-p olivetti-mode) (olivetti-mode -1)); -*-
+#+TITLE: D&D 5e Character sheet (Multiclass edition)
+#+AUTHOR: Thomas Bestvina
+#+STARTUP: overview
+#+CATEGORY: Character
+#+LICENSE: MIT
+
+# HOW TO USE
+# 1. Copy this file and fill in the cells
+# 2. Edit only: ability scores (not mod), Level, proficiency markers (1 / 2), items, coins.
+# 3. Most other things are calculated. Some exceptions to things with many modifiers that may inhibit play if precalculated, e.g. AC.
+# Recalculate the whole buffer with M-x org-table-recalculate-buffer-tables I highly recommend setting this to a bind as you will use it frequently.
+#    (or press C-u C-c * to recalc that table).
+# Passive perception requires two buffer recalculations to be correct upon changing wisdom.
+# 4. Proficiency column: leave blank = none, 1 = proficient, 2 = expertise, 3.. if rules allow.
+# Tips:
+# Olivetti mode and text wrapping can sometimes break the tables, especially spells. If for some reason you find this desirable, remove the top line.
+# To make navigation less clunky, you should keep frames open to different parts of the sheet you're interested in. org-tree-to-indirect-buffer opens a
+# subtree at a point (C-c C-x b). You can save layouts with C-x r w 'x', and restore with C-x r j 'x'. x = any character as a register.
+# e.g. have a layout for combat, layout for non-combat, etc.
+# Editing the table math can be extremely error prone, for homebrew rules that changed these calculations, it's often easier to just delete parts of a calculation and do it yourself,
+# @x$y is row, column (starting at 1), and :: seperates calculations.
+
+# This template can be used perfectly well for single classing, but the class calculations are extra work and difficult to understand when you just want to single class.
+
+* Character
+#+NAME: char
+|--------------------+----|
+| Name               |    |
+| Race               |    |
+| Class              |    |
+| Level              |  5 |
+| XP                 |  0 |
+| Alignment          |    |
+| Background         |    |
+| Proficiency Bonus  | +3 |
+| Passive Perception | 10 |
+|--------------------+----|
+#+TBLFM: @8$2=2+floor((@4$2-1)/4);%+d N::@9$2='(+ 10 (string-to-number remote(as,@6$3)) (* (string-to-number remote(skills,@13$3)) (string-to-number @8$2)) (let ((case-fold-search t)) (if (string-match-p "observant" (mapconcat (lambda (s) s) (list remote(features,@2$1..@>$1)) " ")) 5 0)))::@4$2=remote(classes,@>$2);N
+
+# Casters can be one of: full, half, half-up, third, none. Consult the manual for which is yours.
+#+NAME: classes
+|---------+-------+-----+--------+------------+---------|
+| Class   | Level | Die | Caster | Caster Lvl | Hit Die |
+|---------+-------+-----+--------+------------+---------|
+| Wizard  |     3 |   6 | full   |          3 |     3d6 |
+| Fighter |     2 |  10 | none   |          0 |    2d10 |
+|---------+-------+-----+--------+------------+---------|
+| Total   |     5 |     |        |          3 |         |
+|---------+-------+-----+--------+------------+---------|
+#+TBLFM: @2$5..@>>$5='(let ((l (string-to-number $2))) (cond ((equal $4 "full") l) ((equal $4 "half") (floor l 2)) ((equal $4 "half-up") (ceiling l 2)) ((equal $4 "third") (floor l 3)) (t 0)))::@2$6..@>>$6='(if (> (string-to-number $2) 0) (format "%sd%s" $2 $3) "")::@>$2=vsum(@2$2..@>>$2);N::@>$5=vsum(@2$5..@>>$5);N
+
+#+NAME: as
+|------+-------+-----|
+| Attr | Score | Mod |
+|------+-------+-----|
+| Str  |    10 |  +0 |
+| Dex  |    10 |  +0 |
+| Con  |    10 |  +0 |
+| Int  |    10 |  +0 |
+| Wis  |    10 |  +0 |
+| Cha  |    10 |  +0 |
+|------+-------+-----|
+#+TBLFM: $3=floor(($2-10)/2);%+d N
+
+
+
+* Combat
+#+NAME: combat
+|-------------+-----------|
+| Stat        |     Value |
+|-------------+-----------|
+| Armor Class |        10 |
+| Initiative  |        +0 |
+| Speed       |           |
+| HP Max      |           |
+| HP Current  |           |
+| Temp HP     |           |
+| Hit Dice    | 3d6, 2d10 |
+| Inspiration |           |
+|-------------+-----------|
+#+TBLFM: @3$2=remote(as,@3$3);%+d N::@8$2='(mapconcat (lambda (x) x) (list remote(classes,@2$6..@>>$6)) ", ")
+
+* Attacks & Spellcasting
+# also list the same weapon in the Items table in inventory.
+#+NAME: attacks
+|------+-----------+--------+------+--------+----------+-------|
+| Name | Atk Bonus | Damage | Type | Weight | Equipped | Notes |
+|------+-----------+--------+------+--------+----------+-------|
+|      |           |        |      |        |          |       |
+|------+-----------+--------+------+--------+----------+-------|
+* Skills
+# If you're playing with homebrew skills add a row BELOW everything else.
+# Prof: blank / 1 (proficient) / 2 (expertise)
+#+NAME: skills
+|-----------------+-----+------+------|
+| Skill           | Mod | Prof | Attr |
+|-----------------+-----+------+------|
+| Acrobatics      |  +0 |      | Dex  |
+| Animal Handling |  +0 |      | Wis  |
+| Arcana          |  +0 |      | Int  |
+| Athletics       |  +0 |      | Str  |
+| Deception       |  +0 |      | Cha  |
+| History         |  +0 |      | Int  |
+| Insight         |  +0 |      | Wis  |
+| Intimidation    |  +0 |      | Cha  |
+| Investigation   |  +0 |      | Int  |
+| Medicine        |  +0 |      | Wis  |
+| Nature          |  +0 |      | Int  |
+| Perception      |  +0 |      | Wis  |
+| Performance     |  +0 |      | Cha  |
+| Persuasion      |  +0 |      | Cha  |
+| Religion        |  +0 |      | Int  |
+| Sleight of Hand |  +0 |      | Dex  |
+| Stealth         |  +0 |      | Dex  |
+| Survival        |  +0 |      | Wis  |
+|-----------------+-----+------+------|
+#+TBLFM: @2$2..@>$2='(format "%+d" (+ (string-to-number (org-lookup-first $4 '(remote(as,@2$1..@7$1)) '(remote(as,@2$3..@7$3)))) (* (string-to-number $3) (string-to-number remote(char,@8$2)))))
+
+* Saving throws
+# Adv: put blank / Y, Prof: blank / 1
+|--------------+-----+-----+------|
+| Ability      | Mod | Adv | Prof |
+|--------------+-----+-----+------|
+| Strength     |  +0 |     |      |
+| Dexterity    |  +0 |     |      |
+| Constitution |  +0 |     |      |
+| Intelligence |  +0 |     |      |
+| Wisdom       |  +0 |     |      |
+| Charisma     |  +0 |     |      |
+|--------------+-----+-----+------|
+#+TBLFM: @2$2..@>$2=remote(as,@@#$3)+$4*remote(char,@8$2);%+d N
+
+* Death saves
+|-----------+---+---+---|
+| Successes |   |   |   |
+| Failures  |   |   |   |
+|-----------+---+---+---|
+* Spells
+# Multiclass specific: Just duplicate this per spell classing class, rename the section to be, e.g. Wizard Spells.
+
+# Spellcasting Ability Mod pulls from the spellcasting ability cell.
+|----------------------+-----|
+| Spellcasting Class   |     |
+| Spellcasting Ability | int |
+| Spellcasting Mod     |  +0 |
+| Spell Save DC        |   9 |
+| Spell Attack Bonus   |  +1 |
+| Spell Max Prepared   |     |
+|----------------------+-----|
+#+TBLFM: @3$2='(let ((a (downcase @2$2))) (format "%+d" (string-to-number (cond ((equal a "str") remote(as,@2$3)) ((equal a "dex") remote(as,@3$3)) ((equal a "con") remote(as,@4$3)) ((equal a "int") remote(as,@5$3)) ((equal a "wis") remote(as,@6$3)) ((equal a "cha") remote(as,@7$3)) (t "0")))))::@4$2=8+remote(char,@8$2)+@3$2;N::@5$2=remote(char,@8$2)+@3$2;%+d N
+
+# Prep: A = always prepared, Y = prepared, N = not prepared.
+# To copy more spells, start with prep (or equivalent if description trails), and go up to the line before C/1/... 
+** Cantrips
+|-------+---+-------------|
+| C     |   |             |
+|-------+---+-------------|
+| Name  |   | Description |
+| Range |   |             |
+| C/T   |   |             |
+| Comp  |   |             |
+| Dur   |   |             |
+| A/S   |   |             |
+| Prep  |   |             |
+|-------+---+-------------|
+
+** 1st level
+|-------+--------+---------------|
+| 1     | Slots: | Slots Used: 0 |
+|-------+--------+---------------|
+| Name  |        | Description   |
+| Range |        |               |
+| C/T   |        |               |
+| Comp  |        |               |
+| Dur   |        |               |
+| A/S   |        |               |
+| Prep  |        |               |
+|-------+--------+---------------|
+
+** 2nd level
+|-------+--------+---------------|
+| 2     | Slots: | Slots Used: 0 |
+|-------+--------+---------------|
+| Name  |        | Description   |
+| Range |        |               |
+| C/T   |        |               |
+| Comp  |        |               |
+| Dur   |        |               |
+| A/S   |        |               |
+| Prep  |        |               |
+|-------+--------+---------------|
+
+** 3rd level
+|-------+--------+---------------|
+| 3     | Slots: | Slots Used: 0 |
+|-------+--------+---------------|
+| Name  |        | Description   |
+| Range |        |               |
+| C/T   |        |               |
+| Comp  |        |               |
+| Dur   |        |               |
+| A/S   |        |               |
+| Prep  |        |               |
+|-------+--------+---------------|
+** 4th level
+|-------+--------+---------------|
+| 4     | Slots: | Slots Used: 0 |
+|-------+--------+---------------|
+| Name  |        | Description   |
+| Range |        |               |
+| C/T   |        |               |
+| Comp  |        |               |
+| Dur   |        |               |
+| A/S   |        |               |
+| Prep  |        |               |
+|-------+--------+---------------|
+** 5th level
+|-------+--------+---------------|
+| 5     | Slots: | Slots Used: 0 |
+|-------+--------+---------------|
+| Name  |        | Description   |
+| Range |        |               |
+| C/T   |        |               |
+| Comp  |        |               |
+| Dur   |        |               |
+| A/S   |        |               |
+| Prep  |        |               |
+|-------+--------+---------------|
+** 6th level
+|-------+--------+---------------|
+| 6     | Slots: | Slots Used: 0 |
+|-------+--------+---------------|
+| Name  |        | Description   |
+| Range |        |               |
+| C/T   |        |               |
+| Comp  |        |               |
+| Dur   |        |               |
+| A/S   |        |               |
+| Prep  |        |               |
+|-------+--------+---------------|
+** 7th level
+|-------+--------+---------------|
+| 7     | Slots: | Slots Used: 0 |
+|-------+--------+---------------|
+| Name  |        | Description   |
+| Range |        |               |
+| C/T   |        |               |
+| Comp  |        |               |
+| Dur   |        |               |
+| A/S   |        |               |
+| Prep  |        |               |
+|-------+--------+---------------|
+** 8th level
+|-------+--------+---------------|
+| 8     | Slots: | Slots Used: 0 |
+|-------+--------+---------------|
+| Name  |        | Description   |
+| Range |        |               |
+| C/T   |        |               |
+| Comp  |        |               |
+| Dur   |        |               |
+| A/S   |        |               |
+| Prep  |        |               |
+|-------+--------+---------------|
+** 9th level
+|-------+--------+---------------|
+| 9     | Slots: | Slots Used: 0 |
+|-------+--------+---------------|
+| Name  |        | Description   |
+| Range |        |               |
+| C/T   |        |               |
+| Comp  |        |               |
+| Dur   |        |               |
+| A/S   |        |               |
+| Prep  |        |               |
+|-------+--------+---------------|
+* Armor, weapon, tool, skill proficiencies
+|----------+-------------+--------|
+| Category | Proficiency | Source |
+|----------+-------------+--------|
+|          |             |        |
+|----------+-------------+--------|
+
+* Exhaustion :optional:
+#+NAME: exhaustion
+| Exhaustion Level | 0 |
+
+* Features & Traits
+# If "observant", or any variation e.g. "Observant(feat)" is put in the name column, passive perception will be given a +5.
+# I believe the 2024 version of d&d 5e changes this to give a +1 to int or wis, in this case you may just want to intentionally misspell Observant, e.g. 0bservant.
+#+NAME: features
+|------+-------------|
+| Name | Description |
+|------+-------------|
+|      |             |
+|------+-------------|
+
+* Conditions & concentration :optional:
+#+NAME: concentration
+| Concentrating on |   |
+# Concentration save: CON save, DC = 10 or half the damage taken, whichever is higher.
+ 
+|-----------+--------+----------|
+| Condition | Source | Duration |
+|-----------+--------+----------|
+|           |        |          |
+|           |        |          |
+|-----------+--------+----------|
+ 
+* Class resources :optional:
+# Rages, ki, sorcery points, bardic inspiration, channel divinity, etc.
+|----------+-----+------+----------|
+| Resource | Max | Used | Recharge |
+|----------+-----+------+----------|
+|          |     |      |          |
+|----------+-----+------+----------|
+* Inventory
+** Armor
+# Weight (lb) is added to your carried weight automatically, so don't also list
+# the same armor in the Items table.
+#+NAME: armor
+|-------+----+--------+----------+-------|
+| Armor | AC | Weight | Equipped | Notes |
+|-------+----+--------+----------+-------|
+|       |    |        |          |       |
+|-------+----+--------+----------+-------|
+** Coins
+#+NAME: coins
+|----------+--------|
+| Currency | Amount |
+|----------+--------|
+| CP       |      0 |
+| SP       |      0 |
+| EP       |      0 |
+| GP       |      0 |
+| PP       |      0 |
+|----------+--------|
+** Items
+# Equipped: Y if worn/wielded. Attuned: 1 if attuned (max 3 magic items in standard 5e).
+# Weight counts everything you carry, equipped or not.
+#+NAME: items
+|--------+------+--------+---------------+----------+-------+---------|
+| Amount | Name | Weight | Amount Weight | Equipped | Notes | Attuned |
+|--------+------+--------+---------------+----------+-------+---------|
+|        |      |        |             0 |          |       |         |
+|--------+------+--------+---------------+----------+-------+---------|
+#+TBLFM: $4=$1*$3;N
+ 
+#+NAME: attunement
+| Attunement slots used | 0 | Max | 3 |
+#+TBLFM: @1$2=vsum(remote(items,@2$7..@>$7));N
+
+** Carrying capacity
+# Max Weight = Weight Multiplier x Strength SCORE + Weight Additions (e.g. a bag of holding).
+# Standard 5e carrying capacity depends on size.
+# Coins are assumed to be 0.02 lb's each. If you'd like to remove this, delete "+vsum(remote(coins,@2$2..@>$2))*0.02;%.2f" by regex match.
+# Current Weight = Items + Armor + Weapons (Attacks table) + Coins.
+#+NAME: weight
+|----------------+------------+-------------------+-----------------------------|
+| Current Weight | Max Weight | Weight Multiplier | Weight Additions (e.g. bag) |
+|----------------+------------+-------------------+-----------------------------|
+|           0.00 |        150 |                15 |                           0 |
+|----------------+------------+-------------------+-----------------------------|
+
+#+TBLFM: @2$1=vsum(remote(items,@2$4..@>$4))+vsum(remote(armor,@2$3..@>$3))+vsum(remote(coins,@2$2..@>$2))*0.02;%.2f N::@2$2=@2$3*remote(as,@2$2)+@2$4;N
+* Characteristics
+** Personal characteristics
+|-----------------+---|
+| Personal traits |   |
+| Ideals          |   |
+| Bonds           |   |
+| Flaws           |   |
+|-----------------+---|
+
+** Physical characteristics
+|----------------+-------------|
+| Characteristic | Description |
+|----------------+-------------|
+| Age            |             |
+| Height         |             |
+| Weight         |             |
+| Eyes           |             |
+| Skin           |             |
+| Hair           |             |
+|----------------+-------------|
+
+* Backstory
+  Write backstory here.
+
+* Allies & organizations
+|------+----------|
+| Name | Relation |
+|------+----------|
+|      |          |
+|------+----------|
+* Languages 
+|----------+--------|
+| Language | Source |
+|----------+--------|
+|          |        |
+|          |        |
+|----------+--------|
+* Spell math
+#+NAME: slots
+|----+---+---+---+---+---+---+---+---+---|
+| CL | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|----+---+---+---+---+---+---+---+---+---|
+|  1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+|  2 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+|  3 | 4 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+|  4 | 4 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+|  5 | 4 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+|  6 | 4 | 3 | 3 | 0 | 0 | 0 | 0 | 0 | 0 |
+|  7 | 4 | 3 | 3 | 1 | 0 | 0 | 0 | 0 | 0 |
+|  8 | 4 | 3 | 3 | 2 | 0 | 0 | 0 | 0 | 0 |
+|  9 | 4 | 3 | 3 | 3 | 1 | 0 | 0 | 0 | 0 |
+| 10 | 4 | 3 | 3 | 3 | 2 | 0 | 0 | 0 | 0 |
+| 11 | 4 | 3 | 3 | 3 | 2 | 1 | 0 | 0 | 0 |
+| 12 | 4 | 3 | 3 | 3 | 2 | 1 | 0 | 0 | 0 |
+| 13 | 4 | 3 | 3 | 3 | 2 | 1 | 1 | 0 | 0 |
+| 14 | 4 | 3 | 3 | 3 | 2 | 1 | 1 | 0 | 0 |
+| 15 | 4 | 3 | 3 | 3 | 2 | 1 | 1 | 1 | 0 |
+| 16 | 4 | 3 | 3 | 3 | 2 | 1 | 1 | 1 | 0 |
+| 17 | 4 | 3 | 3 | 3 | 2 | 1 | 1 | 1 | 1 |
+| 18 | 4 | 3 | 3 | 3 | 3 | 1 | 1 | 1 | 1 |
+| 19 | 4 | 3 | 3 | 3 | 3 | 2 | 1 | 1 | 1 |
+| 20 | 4 | 3 | 3 | 3 | 3 | 2 | 2 | 1 | 1 |
+|----+---+---+---+---+---+---+---+---+---|
