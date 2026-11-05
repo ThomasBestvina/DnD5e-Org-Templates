@@ -67,11 +67,11 @@
 * Attacks & Spellcasting
 # also list the same weapon in the Items table in inventory.
 #+NAME: attacks
-|------+-----------+--------+------+--------+----------+-------|
-| Name | Atk Bonus | Damage | Type | Weight | Equipped | Notes |
-|------+-----------+--------+------+--------+----------+-------|
-|      |           |        |      |        |          |       |
-|------+-----------+--------+------+--------+----------+-------|
+|------+-----------+--------+------+----------+-------|
+| Name | Atk Bonus | Damage | Type | Equipped | Notes |
+|------+-----------+--------+------+----------+-------|
+|      |           |        |      |          |       |
+|------+-----------+--------+------+----------+-------|
 * Skills
 # If you're playing with homebrew skills add a row BELOW everything else.
 # Prof: blank / 1 (proficient) / 2 (expertise)
