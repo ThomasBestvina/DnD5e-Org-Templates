@@ -1,0 +1,6 @@
+* D&D 5e Org Mode Templates
+This repository contains two templates for playing D&D with emacs. The first is for basic play with only one class. The second is for people who plan to play with more than one class.
+
+The primary goal of this was a D&D beyond-like experience in emacs, and I think this was largely achieved, so I'm open sourcing it.
+
+Repository is open to contributions, but don't expect it to recieve constant updates. The goal is for it to stay stable without massive revisions. 
