@@ -337,7 +337,7 @@
 # Max Weight = Weight Multiplier x Strength SCORE + Weight Additions (e.g. a bag of holding).
 # Standard 5e carrying capacity depends on size.
 # Coins are assumed to be 0.02 lb's each. If you'd like to remove this, delete "+vsum(remote(coins,@2$2..@>$2))*0.02;%.2f" by regex match.
-# Current Weight = Items + Armor + Weapons (Attacks table) + Coins.
+# Current Weight = Items + Armor + Coins.
 #+NAME: weight
 |----------------+------------+-------------------+-----------------------------|
 | Current Weight | Max Weight | Weight Multiplier | Weight Additions (e.g. bag) |
